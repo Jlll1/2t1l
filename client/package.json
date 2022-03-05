@@ -4,7 +4,7 @@
   "main": "App.js",
   "scripts": {
     "build": "cp index.html dist/index.html && webpack",
-    "serve": "cp index.html dist/index.html && webpack serve --open"
+    "serve": "npm run build && webpack serve --open"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",

@@ -1,10 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 )
+
+var rooms = make(map[string]Room)
+
+type Room struct {
+	Id    string   `json:"id"`
+	Users []string `json:"users"`
+}
+
+type CreateRoomRequest struct {
+	Username string `json:"username"`
+}
 
 func setHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +34,22 @@ func setHeaders(next http.Handler) http.Handler {
 }
 
 func createRoom(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("hello")
+	var roomRequest CreateRoomRequest
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&roomRequest)
+	if err != nil {
+		log.Fatal("bla bla")
+		w.WriteHeader(400)
+		return
+	}
+
+	roomId := fmt.Sprintf("%d", len(rooms))
+	room := Room{Id: roomId, Users: []string{roomRequest.Username}}
+	rooms[roomId] = room
+
+	jsonResponse, _ := json.Marshal(room)
+	w.WriteHeader(200)
+	w.Write(jsonResponse)
 }
 
 func main() {

@@ -3,5 +3,14 @@ document.getElementById('createroom-form')
     ev.preventDefault();
     const name = document.getElementById('username')
       .value;
-    console.log(name);
+    const response = fetch('http://localhost:4444/createroom', {
+      method: 'POST',
+      body: JSON.stringify({roomName: name}),
+      headers: {
+        'content-type': 'applicantion/json'
+      }
+    });
+    if (!response.ok) {
+      throw new Error();
+    }
   });

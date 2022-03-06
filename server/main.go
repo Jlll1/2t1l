@@ -36,7 +36,6 @@ var upgrader = websocket.Upgrader{
 var rooms = make(map[string]Room)
 
 func handleJoinRoomRequest(ws *websocket.Conn) {
-	fmt.Println("JoinRoomRequest")
 	var request JoinRoomRequest
 	err := ws.ReadJSON(&request)
 	if err != nil {
@@ -59,9 +58,8 @@ func handleJoinRoomRequest(ws *websocket.Conn) {
 		}
 	}
 
-	fmt.Print(rooms)
-
 	room.Users = append(room.Users, request.Username)
+	rooms[room.RoomId] = room
 	ws.WriteJSON(RoomJoinedEvent{Type: "RoomJoinedEvent", Room: room})
 }
 

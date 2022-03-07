@@ -13,17 +13,13 @@ module.exports = {
   "module": {
     "rules": [
       {
-        "test": /\.css$/,
-        "use": [ "style-loader", "css-loader" ]
-      },
-      {
-        test: /\.ts?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
+        "test": /\.ts?$/,
+        "use": 'ts-loader',
+        "exclude": /node_modules/,
       }
     ]
   },
-  resolve: {
-    extensions: ['.ts', '.js']
+  "resolve": {
+    "extensions": ['.ts', '.js']
   }
 }

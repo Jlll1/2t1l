@@ -1,3 +1,5 @@
+import { MessageChannel } from "../MessageChannel";
+import { JoinRoomRequest } from "../Messages/JoinRoomRequest";
 import { IViewComponent } from "./IViewComponent";
 
 export class RootComponent implements IViewComponent {
@@ -14,24 +16,12 @@ export class RootComponent implements IViewComponent {
     }
 
     init(): void {
-        const ws = new WebSocket("ws://localhost:4444/app");
-
-        ws.addEventListener("message", function (ev) {
-            console.log(ev);
-        });
-
         document?.getElementById('joinroom-form')
         ?.addEventListener('submit', function (ev) {
             ev.preventDefault();
             const name = (document.getElementById('username') as HTMLInputElement)?.value;
             const roomId = (document.getElementById('room-id') as HTMLInputElement)?.value;
-            ws.send(
-                JSON.stringify({
-                    type: "JoinRoomRequest",
-                    roomId: roomId,
-                    username: name 
-                })
-            )
+            MessageChannel.send(new JoinRoomRequest(roomId, name));
         });
     }
 }

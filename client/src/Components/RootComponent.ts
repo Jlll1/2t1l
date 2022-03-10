@@ -1,27 +1,19 @@
-import { MessageChannel } from "../MessageChannel";
-import { JoinRoomRequest } from "../Messages/JoinRoomRequest";
+import { View } from "../View";
 import { IViewComponent } from "./IViewComponent";
+import { JoinRoomComponent } from "./JoinRoomComponent";
 
 export class RootComponent implements IViewComponent {
+    private rootView: View;
+
+    constructor() {
+        this.rootView = new View("root");
+    }
+
     view(): string {
-        return `
-<form id="joinroom-form">
-    <label for="roomId">Room Id</label>
-    <input type="text" id="room-id">
-    <label for="username">Your name</label>
-    <input type="text" id="username">
-    <input type="submit" value="Join room">
-</form>
-        `;
+        return `<div id="root"></div>`;
     }
 
     init(): void {
-        document?.getElementById('joinroom-form')
-        ?.addEventListener('submit', function (ev) {
-            ev.preventDefault();
-            const name = (document.getElementById('username') as HTMLInputElement)?.value;
-            const roomId = (document.getElementById('room-id') as HTMLInputElement)?.value;
-            MessageChannel.send(new JoinRoomRequest(roomId, name));
-        });
+        this.rootView.setView(new JoinRoomComponent());
     }
 }

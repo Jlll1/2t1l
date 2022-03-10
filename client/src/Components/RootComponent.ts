@@ -1,6 +1,8 @@
 import { View } from "../View";
 import { IViewComponent } from "./IViewComponent";
 import { JoinRoomComponent } from "./JoinRoomComponent";
+import { RoomComponent } from "./RoomComponent";
+import { MessageChannel } from "../MessageChannel";
 
 export class RootComponent implements IViewComponent {
     private rootView: View;
@@ -15,5 +17,9 @@ export class RootComponent implements IViewComponent {
 
     init(): void {
         this.rootView.setView(new JoinRoomComponent());
+
+        MessageChannel.subscribe('RoomJoinedEvent', m => {
+            this.rootView.setView(new RoomComponent());
+        });
     }
 }

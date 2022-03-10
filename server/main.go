@@ -23,8 +23,8 @@ type RoomJoinedEvent struct {
 }
 
 type Room struct {
-	RoomId string
-	Users  []string
+	RoomId string   `json:"roomId"`
+	Users  []string `json:"users"`
 }
 
 var upgrader = websocket.Upgrader{

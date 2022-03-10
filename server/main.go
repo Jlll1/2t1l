@@ -1,67 +1,100 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/websocket"
 )
 
-var rooms = make(map[string]Room)
-
-type Room struct {
-	Id    string   `json:"id"`
-	Users []string `json:"users"`
+type Message struct {
+	Type string `json:"type"`
 }
 
-type CreateRoomRequest struct {
+type JoinRoomRequest struct {
+	RoomId   string `json:"roomId"`
 	Username string `json:"username"`
 }
 
-func setHeaders(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, cache-control")
-
-		if r.Method == "OPTIONS" {
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
+type RoomJoinedEvent struct {
+	Type string `json:"type"`
+	Room
 }
 
-func createRoom(w http.ResponseWriter, r *http.Request) {
-	var roomRequest CreateRoomRequest
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&roomRequest)
+type Room struct {
+	RoomId string   `json:"roomId"`
+	Users  []string `json:"users"`
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+var rooms = make(map[string]Room)
+
+func handleJoinRoomRequest(ws *websocket.Conn) {
+	var request JoinRoomRequest
+	err := ws.ReadJSON(&request)
 	if err != nil {
-		log.Fatal("bla bla")
-		w.WriteHeader(400)
+		log.Fatal(err)
 		return
 	}
 
-	roomId := fmt.Sprintf("%d", len(rooms))
-	room := Room{Id: roomId, Users: []string{roomRequest.Username}}
-	rooms[roomId] = room
+	var room Room
 
-	jsonResponse, _ := json.Marshal(room)
-	w.WriteHeader(200)
-	w.Write(jsonResponse)
+	if request.RoomId == "" {
+		roomId := fmt.Sprintf("%d", len(rooms))
+		rooms[roomId] = Room{RoomId: roomId, Users: []string{}}
+		room = rooms[roomId]
+	} else {
+		var found bool
+		room, found = rooms[request.RoomId]
+		if !found {
+			log.Fatal(fmt.Sprintf("Attempted to join room with Id %s that doesn't exist", request.RoomId))
+			return
+		}
+	}
+
+	room.Users = append(room.Users, request.Username)
+	rooms[room.RoomId] = room
+	ws.WriteJSON(RoomJoinedEvent{Type: "RoomJoinedEvent", Room: room})
+}
+
+func handleConnection(w http.ResponseWriter, r *http.Request) {
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Connection Estabilished")
+
+	defer ws.Close()
+
+	for {
+		var msg Message
+		err := ws.ReadJSON(&msg)
+		if err != nil {
+			log.Fatal(err)
+			break
+		}
+
+		switch msg.Type {
+		case "JoinRoomRequest":
+			handleJoinRoomRequest(ws)
+		}
+	}
 }
 
 func main() {
 	port := "4444"
 
-	r := http.NewServeMux()
-	r.HandleFunc("/createroom", createRoom)
-
-	m := setHeaders(r)
+	http.HandleFunc("/app", handleConnection)
 
 	log.Print("Server starting at localhost:" + port)
-	if err := http.ListenAndServe(":"+port, m); err != nil {
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal(err)
 	}
 }

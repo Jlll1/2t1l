@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   "mode": "none",
-  "entry": "./src/App.js",
+  "entry": "./src/index.ts",
   "output": {
     "path": __dirname + '/dist',
     "filename": "main.js"
@@ -13,19 +13,13 @@ module.exports = {
   "module": {
     "rules": [
       {
-        "test": /\.css$/,
-        "use": [ "style-loader", "css-loader" ]
-      },
-      {
-        "test": /\.js$/,
+        "test": /\.ts?$/,
+        "use": 'ts-loader',
         "exclude": /node_modules/,
-        "use": {
-          "loader": "babel-loader",
-          "options": {
-            "presets": [ "@babel/preset-env" ]
-          }
-        }
       }
     ]
+  },
+  "resolve": {
+    "extensions": ['.ts', '.js']
   }
 }

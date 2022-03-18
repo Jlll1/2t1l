@@ -1,6 +1,6 @@
-import { IMessage } from "./Messages/IMessage";
-import { IMessageHandler } from "./Messages/IMessageHandler";
-import { JoinRoomRequest } from "./Messages/JoinRoomRequest";
+import { IMessage } from "../App/Messages/IMessage";
+import { IMessageHandler } from "../App/Messages/IMessageHandler";
+import { JoinRoomRequest } from "../App/Messages/JoinRoomRequest";
 
 export class MessageChannel {
     private static readonly ws = new WebSocket("ws://localhost:4444/app");

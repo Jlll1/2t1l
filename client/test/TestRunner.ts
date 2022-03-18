@@ -1,5 +1,4 @@
-import { MessageChannel } from "worker_threads";
-import { ExampleTest } from "./example.test";
+import { JoiningRoomTest } from "./JoiningRoom.test";
 
 export class Test {
     public static case(name: string, test: Function): void {
@@ -35,4 +34,4 @@ export class Assert {
 }
 
 /* Register Test Classes */
-new ExampleTest();
+new JoiningRoomTest();

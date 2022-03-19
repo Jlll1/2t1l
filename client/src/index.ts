@@ -1,6 +1,6 @@
-import { RootComponent } from "./Components/RootComponent";
-import { View } from "./View";
+import { RootView } from "./App/View/RootView";
+import { ViewContainer } from "./Framework/ViewContainer";
 
 document.addEventListener('DOMContentLoaded', function() {
-    (new View("app")).setView(new RootComponent());
+    (new ViewContainer("app")).setView(new RootView());
 }, false);

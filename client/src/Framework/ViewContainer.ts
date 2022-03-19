@@ -1,9 +1,9 @@
-import { IViewComponent } from "./Components/IViewComponent";
+import { IView } from "./IView";
 
-export class View {
+export class ViewContainer {
     constructor (private targetId: string) { }
 
-    setView(component: IViewComponent): void {
+    setView(component: IView): void {
         const html = component.view();
         const viewContainer = document.getElementById(this.targetId);
         if (!viewContainer) {
